@@ -14,12 +14,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.github.javafaker.Faker;
 
 import br.com.pedrodeveloper.moviesjwt.model.entities.Movie;
+import br.com.pedrodeveloper.moviesjwt.model.entities.User;
 import br.com.pedrodeveloper.moviesjwt.repository.MovieRepository;
+import br.com.pedrodeveloper.moviesjwt.repository.UserRepository;
 
 @Component
 public class InitializeData implements ApplicationRunner {
@@ -29,10 +32,37 @@ public class InitializeData implements ApplicationRunner {
 	
 	@Autowired
 	private MovieRepository movieRepository;
+	@Autowired
+	private UserRepository userRepository;
+	
+	Logger logger = LoggerFactory.getLogger(this.getClass());
+
+	@Value("${spring.security.user.name}")
+	private String defaultUser;
+	@Value("${spring.security.user.password}")
+	private String defaultPass;
+	@Autowired
+	private PasswordEncoder encoder;
 	
 	public void run(ApplicationArguments args) throws ParseException {
-		Logger logger = LoggerFactory.getLogger(this.getClass());
-		
+		insertDefaultUser();
+		loadFakeData();
+    }
+	
+	private void insertDefaultUser() {
+		if (userRepository.count() == 0l) {
+			logger.info("No users available on the database - Creating default user with user/pass = " + this.defaultUser + "/" + this.defaultPass);
+			
+			User user  = new User();
+			user.setUser(this.defaultUser);
+			user.setPass(encoder.encode(this.defaultPass));
+			userRepository.save(user);
+
+			logger.info("Default user created successfully :)");
+		}
+	}
+
+	private void loadFakeData() {
 		if (limit == 0l) {
 			logger.info("fakedata.limit is set to zero. No initial data will be loaded.");
 			return;
@@ -68,5 +98,5 @@ public class InitializeData implements ApplicationRunner {
 		
 
 		logger.info("Fake data loaded.");
-    }
+	}
 }
