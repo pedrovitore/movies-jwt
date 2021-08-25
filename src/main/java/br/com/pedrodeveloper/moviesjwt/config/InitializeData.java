@@ -2,7 +2,7 @@ package br.com.pedrodeveloper.moviesjwt.config;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.Locale;
@@ -45,7 +45,7 @@ public class InitializeData implements ApplicationRunner {
 			movie.setDirector(faker.artist().name());
 			movie.setOverview(faker.lorem().characters(1400));
 			movie.setRating(new BigDecimal(faker.number().randomDouble(2, 1, 5)));
-			movie.setReleaseDate(LocalDate.ofInstant(faker.date().past(3650, TimeUnit.DAYS).toInstant(), ZoneId.systemDefault()));
+			movie.setReleaseDate(LocalDateTime.ofInstant(faker.date().past(3650, TimeUnit.DAYS).toInstant(), ZoneId.systemDefault()).toLocalDate());
 			movie.setRuntime(LocalTime.of(faker.number().numberBetween(0, 2), faker.number().numberBetween(0, 59), faker.number().numberBetween(0, 59)));
 			
 			int numberOfGenres = faker.number().numberBetween(1, 4);

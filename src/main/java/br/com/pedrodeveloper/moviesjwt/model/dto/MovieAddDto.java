@@ -1,50 +1,61 @@
-package br.com.pedrodeveloper.moviesjwt.model.entities;
+package br.com.pedrodeveloper.moviesjwt.model.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
-@Entity
-public class Movie {
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
-	
+import br.com.pedrodeveloper.moviesjwt.model.entities.Movie;
+
+public class MovieAddDto {
+
+	@NotEmpty
+	@Size(max = 250)
 	private String title;
 	
+	@NotNull
 	private LocalDate releaseDate;
 	
 	private String director;
 	
 	private String overview;
 	
+	@NotNull
+	@DecimalMax(value = "100.00", message = "Rating must be lower than 100")
+	@DecimalMin(value = "0.00", message = "Rating must be greater than 0")
 	private BigDecimal rating;
 	
+	@NotNull
 	private LocalTime runtime;
 	
-//	@ManyToMany
-//	@JoinTable(name = "movie_genres", 
-//			  joinColumns = @JoinColumn(name = "id_movie"), 
-//			  inverseJoinColumns = @JoinColumn(name = "id_genre"))
-//	private List<Genre> genres;
-	@ElementCollection
+	@NotNull
+	@Size(min = 1, message = "Please inform at least 1 genre")
 	private List<String> genres;
+	
+	/**
+	 * Gets a Movie entity based on this dto ready to persist.
+	 */
+	@JsonIgnore
+	public Movie getEntity() {
+		Movie entity = new Movie();
 
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
+		entity.setTitle(getTitle());
+		entity.setReleaseDate(getReleaseDate());
+		entity.setDirector(getDirector());
+		entity.setOverview(getOverview());
+		entity.setRating(getRating());
+		entity.setRuntime(getRuntime());
+		entity.setGenres(getGenres());
+		
+		return entity;
 	}
 
 	public String getTitle() {
@@ -98,23 +109,8 @@ public class Movie {
 	public List<String> getGenres() {
 		return genres;
 	}
-	
+
 	public void setGenres(List<String> genres) {
 		this.genres = genres;
 	}
-	
-	public void addGenre(String genre) {
-		if (this.genres == null)
-			this.genres = new ArrayList<>();
-		
-		this.genres.add(genre);
-	}
-	
-	public void removeGenre(String genre) {
-		if (this.genres == null)
-			return;
-		
-		this.genres.remove(genre);
-	}
-
 }
