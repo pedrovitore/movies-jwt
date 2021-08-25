@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -23,14 +24,23 @@ import br.com.pedrodeveloper.moviesjwt.repository.MovieRepository;
 @Component
 public class InitializeData implements ApplicationRunner {
 
+	@Value("${fakedata.limit}")
+	private Long limit;
+	
 	@Autowired
 	private MovieRepository movieRepository;
 	
 	public void run(ApplicationArguments args) throws ParseException {
-		//Qty of records to add
-		Long max = 10l;
-		
 		Logger logger = LoggerFactory.getLogger(this.getClass());
+		
+		if (limit == 0l) {
+			logger.info("fakedata.limit is set to zero. No initial data will be loaded.");
+			return;
+		}
+		
+		//Qty of records to add
+		Long max = limit;
+		
 		
 		logger.info("Loading fake data into database...");
 		
